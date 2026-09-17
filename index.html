@@ -15,7 +15,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-20 font-sans">
 
-  <!-- URL DO GOOGLE APPS SCRIPT MANTIDA -->
+  <!-- URL DO GOOGLE APPS SCRIPT -->
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfYhfTtN8pVtSy9IJU4A3yIkVoa2bBeIHWuMyCNs86RhNxyf6OEP1D5-rChUdC7w/exec";
   </script>
@@ -49,7 +49,7 @@
 
   <main class="max-w-xl mx-auto p-4 space-y-5">
     
-    <!-- DASHBOARD FINANCEIRO ATUALIZADO -->
+    <!-- DASHBOARD FINANCEIRO -->
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
       <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Resumo Financeiro</h2>
       <div class="grid grid-cols-3 gap-2 text-center">
@@ -162,6 +162,38 @@
         <div class="flex gap-3 justify-end pt-5 mt-5 border-t border-slate-100">
           <button onclick="fecharModalDesejo()" class="px-5 py-2.5 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-xl transition">Cancelar</button>
           <button onclick="salvarDesejo()" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-95">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VALOR PAGO (COMPRA) -->
+  <div id="modalValorPago" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
+    <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-left inline-block align-middle relative transform transition-all">
+        
+        <div class="flex items-center gap-4 mb-6">
+          <div class="bg-emerald-100 text-emerald-600 p-3 rounded-2xl shadow-sm">
+            <i data-lucide="check-circle" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-xl">Item Comprado!</h3>
+            <p class="text-sm text-slate-500">Registre o valor real pago.</p>
+          </div>
+        </div>
+        
+        <input type="hidden" id="vpId">
+        <input type="hidden" id="vpStatus">
+        
+        <div class="mb-6">
+          <label class="font-bold text-slate-600 text-xs uppercase mb-2 block text-center">Valor Pago (R$)</label>
+          <input type="number" step="0.01" id="vpValor" class="w-full text-3xl font-black bg-slate-50 border border-slate-200 rounded-2xl py-4 text-emerald-600 focus:ring-2 focus:ring-emerald-500 outline-none transition text-center" placeholder="0.00">
+          <p id="vpEstimativa" class="text-[11px] text-slate-400 text-center mt-2 font-medium"></p>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button onclick="fecharModalValorPago()" class="flex-1 py-3 text-slate-600 font-bold text-sm hover:bg-slate-50 rounded-xl border border-slate-200 transition">Cancelar</button>
+          <button onclick="confirmarStatusComprado()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-95">Confirmar</button>
         </div>
       </div>
     </div>
@@ -289,7 +321,7 @@
       elEconomia.className = economiaTotal >= 0 ? "text-sm font-extrabold text-blue-700" : "text-sm font-extrabold text-rose-600";
 
       if (listaVisual.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado nesta categoria.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado.</div>`;
         return;
       }
 
@@ -332,7 +364,7 @@
               </div>
               <div class="flex gap-2">
                 ${d.linkLoja ? `<a href="${d.linkLoja}" target="_blank" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
-                <button onclick="alternarStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="p-2.5 rounded-xl font-bold text-sm transition flex items-center justify-center ${isComprado ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
+                <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="p-2.5 rounded-xl font-bold text-sm transition flex items-center justify-center ${isComprado ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
                   <i data-lucide="${isComprado ? 'x' : 'check'}" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -413,21 +445,49 @@
       } finally { esconderLoading(); }
     }
 
-    async function alternarStatus(id, novoStatus, valorEstimado) {
-      let valorPago = 0;
-
+    // LÓGICA DO NOVO MODAL DE VALOR PAGO
+    function iniciarAlteracaoStatus(id, novoStatus, valorEstimado) {
       if (novoStatus === 'Comprado') {
-        let resposta = prompt(`Legal! Qual foi o valor real pago neste item?\n(Estimativa: R$ ${valorEstimado.toFixed(2)})`, valorEstimado.toFixed(2));
+        // Abre o modal bonito ao invés do prompt
+        document.getElementById('vpId').value = id;
+        document.getElementById('vpStatus').value = novoStatus;
+        document.getElementById('vpValor').value = valorEstimado.toFixed(2);
+        document.getElementById('vpEstimativa').textContent = `Estimativa original: R$ ${valorEstimado.toFixed(2)}`;
         
-        if (resposta === null) return; // Usuário cancelou
+        document.getElementById('modalValorPago').classList.remove('hidden');
         
-        valorPago = parseFloat(resposta.replace(',', '.'));
-        if (isNaN(valorPago)) {
-          alert("Valor inválido. Tente novamente usando números.");
-          return;
-        }
+        // Foca no input e seleciona o texto para facilitar a digitação
+        setTimeout(() => {
+          const input = document.getElementById('vpValor');
+          input.focus();
+          input.select();
+        }, 100);
+      } else {
+        // Se estiver voltando para pendente, vai direto
+        executarAlteracaoStatus(id, novoStatus, 0);
+      }
+    }
+
+    function fecharModalValorPago() {
+      document.getElementById('modalValorPago').classList.add('hidden');
+    }
+
+    function confirmarStatusComprado() {
+      const id = document.getElementById('vpId').value;
+      const novoStatus = document.getElementById('vpStatus').value;
+      const valorTxt = document.getElementById('vpValor').value.replace(',', '.');
+      let valorPago = parseFloat(valorTxt);
+
+      if (isNaN(valorPago) || valorTxt.trim() === '') {
+        alert("Por favor, insira um valor válido.");
+        return;
       }
 
+      fecharModalValorPago();
+      executarAlteracaoStatus(id, novoStatus, valorPago);
+    }
+
+    async function executarAlteracaoStatus(id, novoStatus, valorPago) {
       mostrarLoading("Atualizando...");
       try {
         const res = await API({ action: 'atualizarStatus', id: id, status: novoStatus, valorPago: valorPago });
