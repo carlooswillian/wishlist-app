@@ -69,37 +69,53 @@
     </div>
 
     <!-- CONTROLES DE FILTRO E ORDENAÇÃO -->
-    <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-2">
-      <!-- Filtro por Status -->
-      <div class="relative flex items-center">
-        <i data-lucide="filter" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
-        <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
-          <option value="Todos">Status: Todos</option>
-          <option value="Pendente">Pendentes</option>
-          <option value="Comprado">Comprados</option>
-        </select>
+    <div class="space-y-2">
+      <!-- BARRA DE ÍCONES (CLEAN) -->
+      <div class="flex items-center justify-between gap-2">
+        <!-- Botão Filtrar -->
+        <button onclick="alternarPainel('painelFiltros')" class="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 transition active:scale-95">
+          <i data-lucide="filter" class="w-4 h-4 text-rose-500"></i>
+          <span>Filtrar</span>
+          <span id="badgeFiltros" class="hidden w-2 h-2 bg-rose-500 rounded-full"></span>
+        </button>
+
+        <!-- Botão Ordenar -->
+        <button onclick="alternarPainel('painelOrdenacao')" class="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 transition active:scale-95">
+          <i data-lucide="arrow-up-down" class="w-4 h-4 text-rose-500"></i>
+          <span>Ordenar</span>
+        </button>
       </div>
 
-      <!-- Filtro por Categoria -->
-      <div class="relative flex items-center">
-        <i data-lucide="tag" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
-        <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
-          <option value="Todas">Cat: Todas</option>
-          <option value="Bebê">Bebê</option>
-          <option value="Casa">Casa</option>
-          <option value="Eletrônicos">Eletrônicos</option>
-          <option value="Viagem">Viagem</option>
-          <option value="Carro">Carro</option>
-          <option value="Roupas">Roupas</option>
-          <option value="Lazer">Lazer</option>
-          <option value="Outros">Outros</option>
-        </select>
+      <!-- PAINEL EXPANSÍVEL DE FILTROS -->
+      <div id="painelFiltros" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-2 gap-3 transition-all">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Status</label>
+          <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer">
+            <option value="Todos">Todos</option>
+            <option value="Pendente">Pendentes</option>
+            <option value="Comprado">Comprados</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Categoria</label>
+          <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer">
+            <option value="Todas">Todas</option>
+            <option value="Bebê">Bebê</option>
+            <option value="Casa">Casa</option>
+            <option value="Eletrônicos">Eletrônicos</option>
+            <option value="Viagem">Viagem</option>
+            <option value="Carro">Carro</option>
+            <option value="Roupas">Roupas</option>
+            <option value="Lazer">Lazer</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Ordenação -->
-      <div class="relative flex items-center">
-        <i data-lucide="arrow-up-down" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
-        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
+      <!-- PAINEL EXPANSÍVEL DE ORDENAÇÃO -->
+      <div id="painelOrdenacao" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm transition-all">
+        <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Ordenar Por</label>
+        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer">
           <option value="recentes">Mais Recentes</option>
           <option value="antigos">Mais Antigos</option>
           <option value="menorValor">Menor Valor</option>
@@ -314,10 +330,32 @@
       }
     }
 
+    function alternarPainel(id) {
+      const pFiltros = document.getElementById('painelFiltros');
+      const pOrdenacao = document.getElementById('painelOrdenacao');
+      
+      if (id === 'painelFiltros') {
+        pFiltros.classList.toggle('hidden');
+        pOrdenacao.classList.add('hidden');
+      } else {
+        pOrdenacao.classList.toggle('hidden');
+        pFiltros.classList.add('hidden');
+      }
+    }
+
     function aplicarFiltrosEOrdenacao() {
       filtroStatus = document.getElementById('filtroStatus').value;
       filtroCategoria = document.getElementById('filtroCategoria').value;
       ordemAtual = document.getElementById('ordemSelecao').value;
+
+      // Badge visual quando algum filtro estiver ativo
+      const badge = document.getElementById('badgeFiltros');
+      if (filtroStatus !== 'Todos' || filtroCategoria !== 'Todas') {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
       renderizarLista();
     }
 
@@ -368,7 +406,6 @@
       } else if (ordemAtual === 'nome') {
         listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
       }
-      // 'antigos' mantém a ordem cronológica original vinda do banco
 
       if (listaVisual.length === 0) {
         container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado com os filtros selecionados.</div>`;
