@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossa Lista de Desejos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-20 font-sans">
+
+  <!-- COLE A URL DO SEU GOOGLE APPS SCRIPT AQUI -->
+  <script>
+    const SCRIPT_URL = "SEU_LINK_DO_WEB_APP_AQUI";
+  </script>
+
+  <!-- TELA DE BLOQUEIO -->
+  <div id="telaBloqueio" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-xs shadow-2xl space-y-6 text-center transform transition-all">
+      <div class="bg-rose-500 text-white w-14 h-14 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-rose-200">
+        <i data-lucide="heart" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-900 text-xl">Nossos Sonhos</h3>
+        <p class="text-sm text-slate-500 mt-1">Acesse nossa lista de desejos.</p>
+      </div>
+      <input type="password" id="inputPinRaiz" maxlength="4" class="w-full text-center text-3xl font-bold tracking-[0.5em] bg-slate-50 border border-slate-200 rounded-xl py-4 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all" placeholder="••••">
+      <button onclick="desbloquearRaiz()" class="w-full py-3.5 bg-rose-500 text-white font-bold text-sm rounded-xl shadow-md hover:bg-rose-600 active:scale-95 transition-all">Desbloquear</button>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-40 glass border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-2.5">
+      <div class="bg-rose-500 text-white p-2 rounded-xl shadow-sm">
+        <i data-lucide="gift" class="w-5 h-5"></i>
+      </div>
+      <h1 class="font-bold text-xl tracking-tight text-slate-900">Wish<span class="text-rose-500">List</span></h1>
+    </div>
+    <button onclick="sairDoPainel()" class="p-2 rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 active:scale-95 transition text-slate-500 hover:text-rose-500">
+      <i data-lucide="log-out" class="w-5 h-5"></i>
+    </button>
+  </header>
+
+  <main class="max-w-xl mx-auto p-4 space-y-5">
+    
+    <!-- DASHBOARD FINANCEIRO -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Resumo Financeiro</h2>
+      <div class="grid grid-cols-2 gap-3 text-center">
+        <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
+          <span class="block text-[10px] font-bold text-amber-600 uppercase mb-1">A Comprar (Pendentes)</span>
+          <span id="totalPendente" class="text-lg font-extrabold text-amber-700">R$ 0</span>
+        </div>
+        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+          <span class="block text-[10px] font-bold text-emerald-600 uppercase mb-1">Conquistas (Comprados)</span>
+          <span id="totalRealizado" class="text-lg font-extrabold text-emerald-700">R$ 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+      <button onclick="filtrarLista('Todos')" id="btnFiltroTodos" class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow transition shrink-0">Todos</button>
+      <button onclick="filtrarLista('Pendente')" id="btnFiltroPendente" class="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0">Pendentes</button>
+      <button onclick="filtrarLista('Comprado')" id="btnFiltroComprado" class="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0">Comprados</button>
+    </div>
+
+    <!-- LISTA DE DESEJOS -->
+    <div id="listaDesejos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Injetado via JS -->
+    </div>
+  </main>
+
+  <button onclick="abrirModalDesejo()" class="fixed bottom-6 right-6 bg-rose-500 text-white p-4 rounded-full shadow-xl shadow-rose-200 hover:bg-rose-600 active:scale-90 transition-all z-30">
+    <i data-lucide="plus" class="w-6 h-6"></i>
+  </button>
+
+  <!-- MODAL ADICIONAR/EDITAR DESEJO -->
+  <div id="modalDesejo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
+    <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl text-left inline-block align-middle relative transform transition-all">
+        
+        <div class="flex justify-between items-center mb-5">
+          <h3 id="tituloModal" class="font-bold text-slate-900 text-xl">Novo Desejo</h3>
+          <button id="btnExcluirModal" onclick="excluirDesejoDoModal()" class="hidden text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition" title="Excluir">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <input type="hidden" id="dsId">
+
+        <div class="space-y-4">
+          <div>
+            <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">O que queremos?</label>
+            <input type="text" id="dsItem" placeholder="Ex: Robô Aspirador, Sofá novo..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">Valor (R$)</label>
+              <input type="number" step="0.01" id="dsValor" placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+            </div>
+            <div>
+              <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">Prioridade</label>
+              <select id="dsPrioridade" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+                <option value="Necessidade">Necessidade</option>
+                <option value="Desejo" selected>Desejo</option>
+                <option value="Sonho">Sonho</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">Categoria</label>
+            <select id="dsCategoria" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+              <option value="Casa">Casa</option>
+              <option value="Eletrônicos">Eletrônicos</option>
+              <option value="Viagem">Viagem</option>
+              <option value="Carro">Carro</option>
+              <option value="Roupas">Roupas</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">Link da Loja / Referência</label>
+            <div class="relative">
+              <i data-lucide="link" class="w-4 h-4 absolute left-3 top-3.5 text-slate-400"></i>
+              <input type="url" id="dsLinkLoja" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pl-9 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="font-bold text-slate-600 text-xs uppercase block">Link da Imagem</label>
+              <a id="btnBuscaImg" href="#" target="_blank" class="text-[10px] font-bold text-rose-500 hover:underline">Buscar no Google</a>
+            </div>
+            <input type="url" id="dsLinkImagem" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition" oninput="atualizarPreviewImg()">
+            <div id="boxImgPreview" class="hidden mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+              <img id="imgPreview" class="w-full h-full object-cover">
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-600 text-xs uppercase mb-1.5 block">Por que queremos?</label>
+            <textarea id="dsObservacoes" rows="2" placeholder="Motivação ou detalhes técnicos..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition"></textarea>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end pt-5 mt-5 border-t border-slate-100">
+          <button onclick="fecharModalDesejo()" class="px-5 py-2.5 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-xl transition">Cancelar</button>
+          <button onclick="salvarDesejo()" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-95">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LOADING -->
+  <div id="modalLoading" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3">
+      <div class="animate-spin rounded-full h-8 w-8 border-4 border-rose-500 border-t-transparent"></div>
+      <p id="txtLoading" class="font-bold text-slate-700 text-sm">Sincronizando...</p>
+    </div>
+  </div>
+
+  <script>
+    let appData = { desejos: [] };
+    let userPin = null;
+    let filtroAtual = 'Todos';
+
+    window.onload = () => {
+      lucide.createIcons();
+      const pinSalvo = localStorage.getItem('wishlist_pin');
+      if (pinSalvo) {
+        userPin = pinSalvo;
+        document.getElementById('telaBloqueio').classList.add('hidden');
+        carregarDados();
+      }
+    };
+
+    async function API(payload) {
+      if (userPin) payload.pin = userPin;
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    async function desbloquearRaiz() {
+      const pinInput = document.getElementById('inputPinRaiz').value;
+      if(pinInput.length < 4) return alert("Digite o PIN completo.");
+      
+      const res = await API({ action: 'validarPin', pin: pinInput });
+      if (res.sucesso) {
+        userPin = pinInput;
+        localStorage.setItem('wishlist_pin', pinInput);
+        document.getElementById('telaBloqueio').classList.add('hidden');
+        carregarDados();
+      } else {
+        alert("PIN Incorreto. Tente novamente.");
+        document.getElementById('inputPinRaiz').value = '';
+      }
+    }
+
+    function sairDoPainel() {
+      localStorage.removeItem('wishlist_pin');
+      location.reload();
+    }
+
+    function mostrarLoading(texto = "Carregando...") {
+      document.getElementById('txtLoading').textContent = texto;
+      document.getElementById('modalLoading').classList.remove('hidden');
+    }
+
+    function esconderLoading() {
+      document.getElementById('modalLoading').classList.add('hidden');
+    }
+
+    async function carregarDados() {
+      mostrarLoading("Puxando desejos...");
+      try {
+        const res = await API({ action: 'getDados' });
+        if (res.sucesso) {
+          appData = res;
+          renderizarLista();
+        }
+      } catch (e) {
+        alert("Erro de conexão.");
+      } finally {
+        esconderLoading();
+      }
+    }
+
+    function filtrarLista(status) {
+      filtroAtual = status;
+      
+      // Update Button Styles
+      const buttons = ['Todos', 'Pendente', 'Comprado'];
+      buttons.forEach(b => {
+        const btn = document.getElementById(`btnFiltro${b}`);
+        if(b === status) {
+          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow transition shrink-0";
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0";
+        }
+      });
+      renderizarLista();
+    }
+
+    function renderizarLista() {
+      const container = document.getElementById('listaDesejos');
+      container.innerHTML = '';
+
+      let totalPendentes = 0;
+      let totalComprados = 0;
+
+      let listaVisual = appData.desejos.filter(d => {
+        if(d.status === "Pendente") totalPendentes += d.valorEstimado;
+        if(d.status === "Comprado") totalComprados += d.valorEstimado;
+        
+        if(filtroAtual === 'Todos') return true;
+        return d.status === filtroAtual;
+      });
+
+      document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
+      document.getElementById('totalRealizado').textContent = `R$ ${totalComprados.toFixed(2)}`;
+
+      if (listaVisual.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado nesta categoria.</div>`;
+        return;
+      }
+
+      listaVisual.reverse().forEach(d => {
+        container.innerHTML += criarCardHtml(d);
+      });
+      lucide.createIcons();
+    }
+
+    function criarCardHtml(d) {
+      const isComprado = d.status === "Comprado";
+      
+      let corPrioridade = "bg-slate-100 text-slate-600";
+      if(d.prioridade === "Necessidade") corPrioridade = "bg-rose-100 text-rose-700 font-extrabold";
+      if(d.prioridade === "Desejo") corPrioridade = "bg-blue-100 text-blue-700 font-bold";
+      if(d.prioridade === "Sonho") corPrioridade = "bg-purple-100 text-purple-700 font-medium";
+
+      const badgeOpacity = isComprado ? "opacity-60 grayscale" : "";
+
+      return `
+        <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col ${badgeOpacity} transition-all">
+          ${d.linkImagem ? `<img src="${d.linkImagem}" class="w-full h-40 object-cover border-b border-slate-100" onerror="this.style.display='none'">` : ''}
+          
+          <div class="p-4 flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">${d.categoria}</span>
+              <button onclick='abrirModalDesejo(${JSON.stringify(d).replace(/'/g, "&#39;")})' class="text-slate-400 hover:text-rose-500 transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+            </div>
+            
+            <h3 class="font-bold text-slate-900 text-lg leading-tight mb-2 ${isComprado ? 'line-through text-slate-500' : ''}">${d.item}</h3>
+            
+            <div class="flex gap-2 mb-3">
+              <span class="text-[10px] px-2 py-0.5 rounded-md uppercase ${corPrioridade}">${d.prioridade}</span>
+            </div>
+
+            <div class="mt-auto pt-3 border-t border-slate-100 flex items-end justify-between">
+              <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase">Valor Est.</span>
+                <span class="font-extrabold text-slate-800">R$ ${d.valorEstimado.toFixed(2)}</span>
+              </div>
+              <div class="flex gap-2">
+                ${d.linkLoja ? `<a href="${d.linkLoja}" target="_blank" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                <button onclick="alternarStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}')" class="p-2.5 rounded-xl font-bold text-sm transition flex items-center justify-center ${isComprado ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
+                  <i data-lucide="${isComprado ? 'x' : 'check'}" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function atualizarPreviewImg() {
+      const link = document.getElementById('dsLinkImagem').value;
+      const box = document.getElementById('boxImgPreview');
+      const img = document.getElementById('imgPreview');
+      
+      const itemNome = document.getElementById('dsItem').value;
+      document.getElementById('btnBuscaImg').href = `https://www.google.com/search?q=${encodeURIComponent(itemNome + " comprar")}&tbm=isch`;
+
+      if(link) {
+        img.src = link;
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function abrirModalDesejo(d = null) {
+      if (d) {
+        document.getElementById('tituloModal').textContent = 'Editar Item';
+        document.getElementById('btnExcluirModal').classList.remove('hidden');
+        document.getElementById('dsId').value = d.id;
+        document.getElementById('dsItem').value = d.item;
+        document.getElementById('dsValor').value = d.valorEstimado;
+        document.getElementById('dsPrioridade').value = d.prioridade;
+        document.getElementById('dsCategoria').value = d.categoria;
+        document.getElementById('dsLinkLoja').value = d.linkLoja;
+        document.getElementById('dsLinkImagem').value = d.linkImagem;
+        document.getElementById('dsObservacoes').value = d.observacoes;
+      } else {
+        document.getElementById('tituloModal').textContent = 'Novo Desejo';
+        document.getElementById('btnExcluirModal').classList.add('hidden');
+        document.getElementById('dsId').value = '';
+        document.getElementById('dsItem').value = '';
+        document.getElementById('dsValor').value = '';
+        document.getElementById('dsPrioridade').value = 'Desejo';
+        document.getElementById('dsCategoria').value = 'Casa';
+        document.getElementById('dsLinkLoja').value = '';
+        document.getElementById('dsLinkImagem').value = '';
+        document.getElementById('dsObservacoes').value = '';
+      }
+      atualizarPreviewImg();
+      document.getElementById('modalDesejo').classList.remove('hidden');
+    }
+
+    function fecharModalDesejo() {
+      document.getElementById('modalDesejo').classList.add('hidden');
+    }
+
+    async function salvarDesejo() {
+      const item = document.getElementById('dsItem').value.trim();
+      if(!item) return alert("O nome do item é obrigatório.");
+
+      const desejo = {
+        id: document.getElementById('dsId').value,
+        item: item,
+        valorEstimado: parseFloat(document.getElementById('dsValor').value) || 0,
+        prioridade: document.getElementById('dsPrioridade').value,
+        categoria: document.getElementById('dsCategoria').value,
+        linkLoja: document.getElementById('dsLinkLoja').value,
+        linkImagem: document.getElementById('dsLinkImagem').value,
+        observacoes: document.getElementById('dsObservacoes').value
+      };
+
+      fecharModalDesejo();
+      mostrarLoading("Salvando...");
+      try {
+        const res = await API({ action: 'salvarDesejo', desejo: desejo });
+        if(res.sucesso) await carregarDados();
+      } finally { esconderLoading(); }
+    }
+
+    async function alternarStatus(id, novoStatus) {
+      mostrarLoading("Atualizando...");
+      try {
+        const res = await API({ action: 'atualizarStatus', id: id, status: novoStatus });
+        if(res.sucesso) await carregarDados();
+      } finally { esconderLoading(); }
+    }
+
+    async function excluirDesejoDoModal() {
+      const id = document.getElementById('dsId').value;
+      if(!confirm("Tem certeza que deseja remover este item da lista?")) return;
+      
+      fecharModalDesejo();
+      mostrarLoading("Excluindo...");
+      try {
+        const res = await API({ action: 'excluirDesejo', id: id });
+        if(res.sucesso) await carregarDados();
+      } finally { esconderLoading(); }
+    }
+  </script>
+</body>
+</html>
