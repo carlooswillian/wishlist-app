@@ -68,11 +68,46 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
-    <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-      <button onclick="filtrarLista('Todos')" id="btnFiltroTodos" class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow transition shrink-0">Todos</button>
-      <button onclick="filtrarLista('Pendente')" id="btnFiltroPendente" class="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0">Pendentes</button>
-      <button onclick="filtrarLista('Comprado')" id="btnFiltroComprado" class="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0">Comprados</button>
+    <!-- CONTROLES DE FILTRO E ORDENAÇÃO -->
+    <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <!-- Filtro por Status -->
+      <div class="relative flex items-center">
+        <i data-lucide="filter" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
+        <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
+          <option value="Todos">Status: Todos</option>
+          <option value="Pendente">Pendentes</option>
+          <option value="Comprado">Comprados</option>
+        </select>
+      </div>
+
+      <!-- Filtro por Categoria -->
+      <div class="relative flex items-center">
+        <i data-lucide="tag" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
+        <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
+          <option value="Todas">Cat: Todas</option>
+          <option value="Bebê">Bebê</option>
+          <option value="Casa">Casa</option>
+          <option value="Eletrônicos">Eletrônicos</option>
+          <option value="Viagem">Viagem</option>
+          <option value="Carro">Carro</option>
+          <option value="Roupas">Roupas</option>
+          <option value="Lazer">Lazer</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+
+      <!-- Ordenação -->
+      <div class="relative flex items-center">
+        <i data-lucide="arrow-up-down" class="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none"></i>
+        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl pl-9 pr-3 py-2.5 border border-slate-100 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer transition">
+          <option value="recentes">Mais Recentes</option>
+          <option value="antigos">Mais Antigos</option>
+          <option value="menorValor">Menor Valor</option>
+          <option value="maiorValor">Maior Valor</option>
+          <option value="prioridade">Prioridade</option>
+          <option value="nome">Nome (A-Z)</option>
+        </select>
+      </div>
     </div>
 
     <!-- LISTA DE DESEJOS -->
@@ -210,7 +245,10 @@
   <script>
     let appData = { desejos: [] };
     let userPin = null;
-    let filtroAtual = 'Todos';
+
+    let filtroStatus = 'Todos';
+    let filtroCategoria = 'Todas';
+    let ordemAtual = 'recentes';
 
     window.onload = () => {
       lucide.createIcons();
@@ -276,18 +314,10 @@
       }
     }
 
-    function filtrarLista(status) {
-      filtroAtual = status;
-      
-      const buttons = ['Todos', 'Pendente', 'Comprado'];
-      buttons.forEach(b => {
-        const btn = document.getElementById(`btnFiltro${b}`);
-        if(b === status) {
-          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow transition shrink-0";
-        } else {
-          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shrink-0";
-        }
-      });
+    function aplicarFiltrosEOrdenacao() {
+      filtroStatus = document.getElementById('filtroStatus').value;
+      filtroCategoria = document.getElementById('filtroCategoria').value;
+      ordemAtual = document.getElementById('ordemSelecao').value;
       renderizarLista();
     }
 
@@ -299,6 +329,7 @@
       let totalGastoReal = 0;
       let economiaTotal = 0;
 
+      // 1. Filtragem e cálculo financeiro global
       let listaVisual = appData.desejos.filter(d => {
         if(d.status === "Pendente") {
             totalPendentes += d.valorEstimado;
@@ -309,10 +340,13 @@
             economiaTotal += (d.valorEstimado - pago);
         }
         
-        if(filtroAtual === 'Todos') return true;
-        return d.status === filtroAtual;
+        const passaStatus = (filtroStatus === 'Todos' || d.status === filtroStatus);
+        const passaCategoria = (filtroCategoria === 'Todas' || d.categoria === filtroCategoria);
+
+        return passaStatus && passaCategoria;
       });
 
+      // Atualiza os cards financeiros
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
       document.getElementById('totalRealizado').textContent = `R$ ${totalGastoReal.toFixed(2)}`;
       
@@ -320,12 +354,28 @@
       elEconomia.textContent = `R$ ${economiaTotal.toFixed(2)}`;
       elEconomia.className = economiaTotal >= 0 ? "text-sm font-extrabold text-blue-700" : "text-sm font-extrabold text-rose-600";
 
+      // 2. Ordenação da lista
+      const prioridadePeso = { 'Necessidade': 3, 'Desejo': 2, 'Sonho': 1 };
+
+      if (ordemAtual === 'recentes') {
+        listaVisual.reverse();
+      } else if (ordemAtual === 'menorValor') {
+        listaVisual.sort((a, b) => (a.valorEstimado || 0) - (b.valorEstimado || 0));
+      } else if (ordemAtual === 'maiorValor') {
+        listaVisual.sort((a, b) => (b.valorEstimado || 0) - (a.valorEstimado || 0));
+      } else if (ordemAtual === 'prioridade') {
+        listaVisual.sort((a, b) => (prioridadePeso[b.prioridade] || 0) - (prioridadePeso[a.prioridade] || 0));
+      } else if (ordemAtual === 'nome') {
+        listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
+      }
+      // 'antigos' mantém a ordem cronológica original vinda do banco
+
       if (listaVisual.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado com os filtros selecionados.</div>`;
         return;
       }
 
-      listaVisual.reverse().forEach(d => {
+      listaVisual.forEach(d => {
         container.innerHTML += criarCardHtml(d);
       });
       lucide.createIcons();
@@ -445,10 +495,8 @@
       } finally { esconderLoading(); }
     }
 
-    // LÓGICA DO NOVO MODAL DE VALOR PAGO
     function iniciarAlteracaoStatus(id, novoStatus, valorEstimado) {
       if (novoStatus === 'Comprado') {
-        // Abre o modal bonito ao invés do prompt
         document.getElementById('vpId').value = id;
         document.getElementById('vpStatus').value = novoStatus;
         document.getElementById('vpValor').value = valorEstimado.toFixed(2);
@@ -456,14 +504,12 @@
         
         document.getElementById('modalValorPago').classList.remove('hidden');
         
-        // Foca no input e seleciona o texto para facilitar a digitação
         setTimeout(() => {
           const input = document.getElementById('vpValor');
           input.focus();
           input.select();
         }, 100);
       } else {
-        // Se estiver voltando para pendente, vai direto
         executarAlteracaoStatus(id, novoStatus, 0);
       }
     }
