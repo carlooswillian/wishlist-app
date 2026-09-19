@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nossa Lista de Desejos</title>
   <link rel="manifest" href="manifest.json">
-  <!-- Atualizado para a nova cor principal (Indigo-600) -->
   <meta name="theme-color" content="#4f46e5">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Suaviza a barra de rolagem e toques */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     body { -webkit-tap-highlight-color: transparent; }
@@ -24,7 +22,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfYhfTtN8pVtSy9IJU4A3yIkVoa2bBeIHWuMyCNs86RhNxyf6OEP1D5-rChUdC7w/exec";
   </script>
 
-  <!-- TELA DE BLOQUEIO MINIMALISTA -->
+  <!-- TELA DE BLOQUEIO -->
   <div id="telaBloqueio" class="fixed inset-0 bg-zinc-950 z-[70] flex items-center justify-center p-4">
     <div class="bg-white rounded-[24px] p-8 w-full max-w-xs shadow-2xl space-y-6 text-center">
       <div class="bg-indigo-50 text-indigo-600 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-2">
@@ -39,10 +37,8 @@
     </div>
   </div>
 
-  <!-- CABEÇALHO FIXO + CONTROLES (STICKY MINIMALISTA) -->
+  <!-- CABEÇALHO FIXO -->
   <div class="sticky top-0 z-40 bg-zinc-50/85 backdrop-blur-xl border-b border-zinc-200/80 shadow-sm">
-    
-    <!-- Linha 1: Logo e Ações -->
     <div class="px-5 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <i data-lucide="gift" class="w-5 h-5 text-indigo-600"></i>
@@ -50,12 +46,12 @@
       </div>
       
       <div class="flex items-center gap-4">
-        <!-- Ícones de Filtro e Ordenação direto no header -->
-        <button onclick="alternarPainel('painelFiltros')" class="relative text-zinc-400 hover:text-indigo-600 transition-colors">
+        <!-- Botões agora abrem Modais -->
+        <button onclick="abrirModalFiltros()" class="relative text-zinc-400 hover:text-indigo-600 transition-colors">
           <i data-lucide="filter" class="w-5 h-5"></i>
           <span id="badgeFiltros" class="hidden absolute -top-1 -right-1 w-2 h-2 bg-indigo-600 rounded-full border border-white"></span>
         </button>
-        <button onclick="alternarPainel('painelOrdenacao')" class="text-zinc-400 hover:text-indigo-600 transition-colors">
+        <button onclick="abrirModalOrdenacao()" class="text-zinc-400 hover:text-indigo-600 transition-colors">
           <i data-lucide="arrow-up-down" class="w-5 h-5"></i>
         </button>
         <div class="w-px h-5 bg-zinc-200 mx-1"></div>
@@ -65,7 +61,7 @@
       </div>
     </div>
 
-    <!-- Linha 2: Resumo Financeiro Condensado -->
+    <!-- Resumo Financeiro -->
     <div class="px-5 pb-4">
       <div class="bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm flex justify-between items-center text-center">
         <div class="flex-1">
@@ -84,61 +80,97 @@
         </div>
       </div>
     </div>
-
-    <!-- PAINÉIS EXPANSÍVEIS DE FILTRO E ORDENAÇÃO (Ficam sob o vidro sticky) -->
-    <div id="painelFiltros" class="hidden px-5 pb-4 transition-all">
-      <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Status</label>
-          <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-xs font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
-            <option value="Todos">Todos</option>
-            <option value="Pendente">Pendentes</option>
-            <option value="Comprado">Comprados</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
-          <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-xs font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
-            <option value="Todas">Todas</option>
-            <option value="Bebê">Bebê</option>
-            <option value="Casa">Casa</option>
-            <option value="Eletrônicos">Eletrônicos</option>
-            <option value="Viagem">Viagem</option>
-            <option value="Carro">Carro</option>
-            <option value="Roupas">Roupas</option>
-            <option value="Lazer">Lazer</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div id="painelOrdenacao" class="hidden px-5 pb-4 transition-all">
-      <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
-        <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Ordenar Por</label>
-        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
-          <option value="recentes">Adicionados Recentemente</option>
-          <option value="antigos">Mais Antigos</option>
-          <option value="menorValor">Menor Valor</option>
-          <option value="maiorValor">Maior Valor</option>
-          <option value="prioridade">Maior Prioridade</option>
-          <option value="nome">Ordem Alfabética (A-Z)</option>
-        </select>
-      </div>
-    </div>
   </div>
 
   <main class="max-w-xl mx-auto p-5 pt-6">
-    <!-- LISTA DE DESEJOS -->
     <div id="listaDesejos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- Injetado via JS -->
     </div>
   </main>
 
-  <!-- BOTÃO FLUTUANTE (FAB) -->
   <button onclick="abrirModalDesejo()" class="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 active:scale-90 transition-all z-30 flex items-center justify-center">
     <i data-lucide="plus" class="w-6 h-6"></i>
   </button>
+
+  <!-- MODAL DE FILTROS -->
+  <div id="modalFiltros" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
+    <div class="min-h-screen px-4 text-center flex items-end sm:items-center justify-center py-6">
+      <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-3">
+            <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+              <i data-lucide="filter" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-zinc-900 text-xl tracking-tight">Filtros</h3>
+          </div>
+          <button onclick="fecharModalFiltros()" class="text-zinc-400 hover:text-zinc-700 p-1 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Status</label>
+            <select id="filtroStatus" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
+              <option value="Todos">Todos</option>
+              <option value="Pendente">Pendentes</option>
+              <option value="Comprado">Comprados</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
+            <select id="filtroCategoria" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
+              <option value="Todas">Todas</option>
+              <option value="Bebê">Bebê</option>
+              <option value="Casa">Casa</option>
+              <option value="Eletrônicos">Eletrônicos</option>
+              <option value="Viagem">Viagem</option>
+              <option value="Carro">Carro</option>
+              <option value="Roupas">Roupas</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          <button onclick="limparFiltros()" class="px-5 py-3.5 text-zinc-500 font-bold text-sm hover:bg-zinc-100 rounded-xl transition-colors">Limpar</button>
+          <button onclick="aplicarFiltrosEOrdenacao(); fecharModalFiltros()" class="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95">Aplicar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE ORDENAÇÃO -->
+  <div id="modalOrdenacao" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
+    <div class="min-h-screen px-4 text-center flex items-end sm:items-center justify-center py-6">
+      <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-3">
+            <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+              <i data-lucide="arrow-up-down" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-zinc-900 text-xl tracking-tight">Ordenar Por</h3>
+          </div>
+          <button onclick="fecharModalOrdenacao()" class="text-zinc-400 hover:text-zinc-700 p-1 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <div>
+          <select id="ordemSelecao" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
+            <option value="recentes">Adicionados Recentemente</option>
+            <option value="antigos">Mais Antigos</option>
+            <option value="menorValor">Menor Valor</option>
+            <option value="maiorValor">Maior Valor</option>
+            <option value="prioridade">Maior Prioridade</option>
+            <option value="nome">Ordem Alfabética (A-Z)</option>
+          </select>
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          <button onclick="fecharModalOrdenacao()" class="px-5 py-3.5 text-zinc-500 font-bold text-sm hover:bg-zinc-100 rounded-xl transition-colors">Cancelar</button>
+          <button onclick="aplicarFiltrosEOrdenacao(); fecharModalOrdenacao()" class="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95">Aplicar Ordem</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL ADICIONAR/EDITAR DESEJO -->
   <div id="modalDesejo" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto hide-scrollbar">
@@ -222,7 +254,7 @@
     </div>
   </div>
 
-  <!-- MODAL VALOR PAGO (COMPRA) -->
+  <!-- MODAL VALOR PAGO -->
   <div id="modalValorPago" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
     <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
       <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
@@ -333,17 +365,24 @@
       }
     }
 
-    function alternarPainel(id) {
-      const pFiltros = document.getElementById('painelFiltros');
-      const pOrdenacao = document.getElementById('painelOrdenacao');
-      
-      if (id === 'painelFiltros') {
-        pFiltros.classList.toggle('hidden');
-        pOrdenacao.classList.add('hidden');
-      } else {
-        pOrdenacao.classList.toggle('hidden');
-        pFiltros.classList.add('hidden');
-      }
+    /* CONTROLE DOS MODAIS DE FILTRO E ORDENAÇÃO */
+    function abrirModalFiltros() {
+      document.getElementById('modalFiltros').classList.remove('hidden');
+    }
+    function fecharModalFiltros() {
+      document.getElementById('modalFiltros').classList.add('hidden');
+    }
+    function abrirModalOrdenacao() {
+      document.getElementById('modalOrdenacao').classList.remove('hidden');
+    }
+    function fecharModalOrdenacao() {
+      document.getElementById('modalOrdenacao').classList.add('hidden');
+    }
+    function limparFiltros() {
+      document.getElementById('filtroStatus').value = 'Todos';
+      document.getElementById('filtroCategoria').value = 'Todas';
+      aplicarFiltrosEOrdenacao();
+      fecharModalFiltros();
     }
 
     function aplicarFiltrosEOrdenacao() {
@@ -370,7 +409,6 @@
       let totalGastoReal = 0;
       let economiaTotal = 0;
 
-      // 1. Filtragem e cálculo financeiro global
       let listaVisual = appData.desejos.filter(d => {
         if(d.status === "Pendente") {
             totalPendentes += d.valorEstimado;
@@ -387,16 +425,13 @@
         return passaStatus && passaCategoria;
       });
 
-      // Atualiza os cards financeiros
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
       document.getElementById('totalRealizado').textContent = `R$ ${totalGastoReal.toFixed(2)}`;
       
       const elEconomia = document.getElementById('totalEconomia');
       elEconomia.textContent = `R$ ${economiaTotal.toFixed(2)}`;
-      // Verde se positivo/zero, vermelho se negativo
       elEconomia.className = economiaTotal >= 0 ? "text-xs font-bold text-emerald-500" : "text-xs font-bold text-red-500";
 
-      // 2. Ordenação da lista
       const prioridadePeso = { 'Necessidade': 3, 'Desejo': 2, 'Sonho': 1 };
 
       if (ordemAtual === 'recentes') {
@@ -425,7 +460,6 @@
     function criarCardHtml(d) {
       const isComprado = d.status === "Comprado";
       
-      // Cores mais premium para as tags
       let corPrioridade = "bg-zinc-100 text-zinc-600";
       if(d.prioridade === "Necessidade") corPrioridade = "bg-indigo-100 text-indigo-700 font-extrabold";
       if(d.prioridade === "Desejo") corPrioridade = "bg-sky-100 text-sky-700 font-bold";
@@ -596,7 +630,6 @@
     }
   </script>
 
-  <!-- SCRIPT PARA REGISTRAR O PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
