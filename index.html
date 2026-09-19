@@ -469,7 +469,7 @@
       lucide.createIcons();
     }
 
-    // === NOVO DESIGN DO CARD ===
+        // === NOVO DESIGN DO CARD ===
     function criarCardHtml(d) {
       const isComprado = d.status === "Comprado";
       
@@ -496,6 +496,29 @@
         ? `<a href="${d.linkLoja}" target="_blank" class="w-9 h-9 flex items-center justify-center bg-zinc-50 text-zinc-500 border border-zinc-200/80 rounded-full hover:bg-zinc-100 hover:text-indigo-600 transition-colors" title="Ver na loja"><i data-lucide="shopping-bag" class="w-4 h-4"></i></a>` 
         : '';
 
+      // Bloco dinâmico de Valores: Orçado e Pago
+      const valorPago = d.valorPago !== undefined ? d.valorPago : 0;
+      const htmlValores = isComprado 
+        ? `
+          <div class="flex items-center gap-2">
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Orçado</span>
+              <span class="font-bold text-zinc-400 text-xs line-through">R$ ${d.valorEstimado.toFixed(2)}</span>
+            </div>
+            <div class="w-px h-6 bg-zinc-200"></div>
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">Pago</span>
+              <span class="font-black text-emerald-600 text-sm">R$ ${valorPago.toFixed(2)}</span>
+            </div>
+          </div>
+        `
+        : `
+          <div class="flex flex-col">
+            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Orçado</span>
+            <span class="font-black text-zinc-800 text-base">R$ ${d.valorEstimado.toFixed(2)}</span>
+          </div>
+        `;
+
       return `
         <div class="bg-white rounded-[20px] overflow-hidden shadow-sm border border-zinc-200/80 relative flex flex-col ${badgeOpacity} hover:shadow-md transition-all duration-300">
           
@@ -521,12 +544,10 @@
 
             <!-- Rodapé do Card (Preço e Ações) -->
             <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
-              <div class="flex flex-col">
-                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Valor Est.</span>
-                <span class="font-black text-zinc-800 text-base">R$ ${d.valorEstimado.toFixed(2)}</span>
-              </div>
               
-              <div class="flex gap-2">
+              ${htmlValores}
+              
+              <div class="flex gap-2 shrink-0 ml-2">
                 ${btnLink}
                 <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="w-9 h-9 flex items-center justify-center rounded-full font-bold transition-colors ${isComprado ? 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
                   <i data-lucide="${isComprado ? 'x' : 'check'}" class="w-4 h-4"></i>
@@ -538,6 +559,7 @@
         </div>
       `;
     }
+
 
     function atualizarPreviewImg() {
       const link = document.getElementById('dsLinkImagem').value;
