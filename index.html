@@ -92,11 +92,10 @@
     <i data-lucide="plus" class="w-6 h-6"></i>
   </button>
 
-  <!-- MODAL DE FILTROS (Centralizado) -->
+  <!-- MODAL DE FILTROS -->
   <div id="modalFiltros" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
-    <!-- Removido o items-end e colocado apenas items-center para garantir centralização em todas as telas -->
     <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
-      <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
+      <div class="bg-white rounded-[24px] p-6 w-full max-w-md shadow-2xl text-left relative transform transition-all">
         <div class="flex justify-between items-center mb-6">
           <div class="flex items-center gap-3">
             <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
@@ -107,54 +106,59 @@
           <button onclick="fecharModalFiltros()" class="text-zinc-400 hover:text-zinc-700 p-1 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         
-        <div class="space-y-4">
+        <div class="space-y-6">
+          
+          <!-- Filtro Status Múltiplo -->
           <div>
-            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Status</label>
-            <select id="filtroStatus" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
-              <option value="Todos">Todos</option>
-              <option value="Pendente">Pendentes</option>
-              <option value="Comprado">Comprados</option>
-            </select>
+            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-2 block">Status</label>
+            <div class="flex flex-wrap gap-2">
+              <label class="cursor-pointer select-none">
+                <input type="checkbox" value="Pendente" class="peer sr-only filtro-checkbox status-checkbox">
+                <span class="px-3.5 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Pendente</span>
+              </label>
+              <label class="cursor-pointer select-none">
+                <input type="checkbox" value="Comprado" class="peer sr-only filtro-checkbox status-checkbox">
+                <span class="px-3.5 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Comprado</span>
+              </label>
+            </div>
           </div>
           
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
-              <select id="filtroCategoria" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
-                <option value="Todas">Todas</option>
-                <option value="Bebê">Bebê</option>
-                <option value="Casa">Casa</option>
-                <option value="Eletrônicos">Eletrônicos</option>
-                <option value="Viagem">Viagem</option>
-                <option value="Carro">Carro</option>
-                <option value="Roupas">Roupas</option>
-                <option value="Lazer">Lazer</option>
-                <option value="Outros">Outros</option>
-              </select>
+          <!-- Filtro Categoria Múltiplo -->
+          <div>
+            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-2 block">Categorias</label>
+            <div class="flex flex-wrap gap-2">
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Bebê" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Bebê</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Casa" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Casa</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Eletrônicos" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Eletrônicos</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Viagem" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Viagem</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Carro" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Carro</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Roupas" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Roupas</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Lazer" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Lazer</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Outros" class="peer sr-only filtro-checkbox categoria-checkbox"><span class="px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-medium text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Outros</span></label>
             </div>
-            <div>
-              <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Prioridade</label>
-              <select id="filtroPrioridade" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
-                <option value="Todas">Todas</option>
-                <option value="Necessidade">Necessidade</option>
-                <option value="Desejo">Desejo</option>
-                <option value="Sonho">Sonho</option>
-              </select>
+          </div>
+
+          <!-- Filtro Prioridade Múltiplo -->
+          <div>
+            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-2 block">Prioridade</label>
+            <div class="flex flex-wrap gap-2">
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Necessidade" class="peer sr-only filtro-checkbox prioridade-checkbox"><span class="px-3.5 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Necessidade</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Desejo" class="peer sr-only filtro-checkbox prioridade-checkbox"><span class="px-3.5 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Desejo</span></label>
+              <label class="cursor-pointer select-none"><input type="checkbox" value="Sonho" class="peer sr-only filtro-checkbox prioridade-checkbox"><span class="px-3.5 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:border-indigo-300 transition-all block">Sonho</span></label>
             </div>
           </div>
         </div>
 
         <div class="mt-8 flex gap-3">
-          <button onclick="limparFiltros()" class="px-5 py-3.5 text-zinc-500 font-bold text-sm hover:bg-zinc-100 rounded-xl transition-colors">Limpar</button>
-          <button onclick="aplicarFiltrosEOrdenacao(); fecharModalFiltros()" class="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95">Aplicar</button>
+          <button onclick="limparFiltros()" class="px-5 py-3.5 text-zinc-500 font-bold text-sm hover:bg-zinc-100 rounded-xl transition-colors">Limpar Tudo</button>
+          <button onclick="aplicarFiltrosEOrdenacao(); fecharModalFiltros()" class="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95">Aplicar Filtros</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL DE ORDENAÇÃO (Centralizado) -->
+  <!-- MODAL DE ORDENAÇÃO -->
   <div id="modalOrdenacao" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
-    <!-- Ajustado para items-center para garantir centralização -->
     <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
       <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
         <div class="flex justify-between items-center mb-6">
@@ -311,9 +315,10 @@
     let appData = { desejos: [] };
     let userPin = null;
 
-    let filtroStatus = 'Todos';
-    let filtroCategoria = 'Todas';
-    let filtroPrioridade = 'Todas'; // Nova variável de prioridade
+    // Arrays para guardar as múltiplas seleções
+    let filtrosStatus = [];
+    let filtrosCategoria = [];
+    let filtrosPrioridade = [];
     let ordemAtual = 'recentes';
 
     window.onload = () => {
@@ -393,23 +398,24 @@
     function fecharModalOrdenacao() {
       document.getElementById('modalOrdenacao').classList.add('hidden');
     }
+    
     function limparFiltros() {
-      document.getElementById('filtroStatus').value = 'Todos';
-      document.getElementById('filtroCategoria').value = 'Todas';
-      document.getElementById('filtroPrioridade').value = 'Todas'; // Limpa a prioridade
+      // Desmarca todos os checkboxes dos filtros
+      document.querySelectorAll('.filtro-checkbox').forEach(cb => cb.checked = false);
       aplicarFiltrosEOrdenacao();
       fecharModalFiltros();
     }
 
     function aplicarFiltrosEOrdenacao() {
-      filtroStatus = document.getElementById('filtroStatus').value;
-      filtroCategoria = document.getElementById('filtroCategoria').value;
-      filtroPrioridade = document.getElementById('filtroPrioridade').value;
+      // Pega todos os valores checados de cada grupo (cria arrays)
+      filtrosStatus = Array.from(document.querySelectorAll('.status-checkbox:checked')).map(cb => cb.value);
+      filtrosCategoria = Array.from(document.querySelectorAll('.categoria-checkbox:checked')).map(cb => cb.value);
+      filtrosPrioridade = Array.from(document.querySelectorAll('.prioridade-checkbox:checked')).map(cb => cb.value);
       ordemAtual = document.getElementById('ordemSelecao').value;
 
       // Badge visual quando algum filtro estiver ativo
       const badge = document.getElementById('badgeFiltros');
-      if (filtroStatus !== 'Todos' || filtroCategoria !== 'Todas' || filtroPrioridade !== 'Todas') {
+      if (filtrosStatus.length > 0 || filtrosCategoria.length > 0 || filtrosPrioridade.length > 0) {
         badge.classList.remove('hidden');
       } else {
         badge.classList.add('hidden');
@@ -422,11 +428,22 @@
       const container = document.getElementById('listaDesejos');
       container.innerHTML = '';
 
+      // 1. FILTRAR A LISTA PRIMEIRO
+      let listaVisual = appData.desejos.filter(d => {
+        // Se o array do filtro estiver vazio, significa que não há restrição ("Todas" selecionadas)
+        const passaStatus = filtrosStatus.length === 0 || filtrosStatus.includes(d.status);
+        const passaCategoria = filtrosCategoria.length === 0 || filtrosCategoria.includes(d.categoria);
+        const passaPrioridade = filtrosPrioridade.length === 0 || filtrosPrioridade.includes(d.prioridade);
+
+        return passaStatus && passaCategoria && passaPrioridade;
+      });
+
+      // 2. CALCULAR O RESUMO FINANCEIRO SOMENTE DA LISTA FILTRADA
       let totalPendentes = 0;
       let totalGastoReal = 0;
       let economiaTotal = 0;
 
-      let listaVisual = appData.desejos.filter(d => {
+      listaVisual.forEach(d => {
         if(d.status === "Pendente") {
             totalPendentes += d.valorEstimado;
         }
@@ -435,14 +452,9 @@
             totalGastoReal += pago;
             economiaTotal += (d.valorEstimado - pago);
         }
-        
-        const passaStatus = (filtroStatus === 'Todos' || d.status === filtroStatus);
-        const passaCategoria = (filtroCategoria === 'Todas' || d.categoria === filtroCategoria);
-        const passaPrioridade = (filtroPrioridade === 'Todas' || d.prioridade === filtroPrioridade);
-
-        return passaStatus && passaCategoria && passaPrioridade;
       });
 
+      // Atualiza o painel superior com os valores calculados
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
       document.getElementById('totalRealizado').textContent = `R$ ${totalGastoReal.toFixed(2)}`;
       
@@ -450,6 +462,7 @@
       elEconomia.textContent = `R$ ${economiaTotal.toFixed(2)}`;
       elEconomia.className = economiaTotal >= 0 ? "text-xs font-bold text-emerald-500" : "text-xs font-bold text-red-500";
 
+      // 3. ORDENAR A LISTA
       const prioridadePeso = { 'Necessidade': 3, 'Desejo': 2, 'Sonho': 1 };
 
       if (ordemAtual === 'recentes') {
@@ -464,6 +477,7 @@
         listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
       }
 
+      // 4. RENDERIZAR NA TELA
       if (listaVisual.length === 0) {
         container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400 font-medium text-sm">Nenhum item encontrado com os filtros selecionados.</div>`;
         return;
