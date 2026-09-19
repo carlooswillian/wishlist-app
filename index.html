@@ -83,7 +83,7 @@
   </div>
 
   <main class="max-w-xl mx-auto p-5 pt-6">
-    <div id="listaDesejos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div id="listaDesejos" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <!-- Injetado via JS -->
     </div>
   </main>
@@ -315,7 +315,6 @@
     let appData = { desejos: [] };
     let userPin = null;
 
-    // Arrays para guardar as múltiplas seleções
     let filtrosStatus = [];
     let filtrosCategoria = [];
     let filtrosPrioridade = [];
@@ -385,35 +384,23 @@
       }
     }
 
-    /* CONTROLE DOS MODAIS DE FILTRO E ORDENAÇÃO */
-    function abrirModalFiltros() {
-      document.getElementById('modalFiltros').classList.remove('hidden');
-    }
-    function fecharModalFiltros() {
-      document.getElementById('modalFiltros').classList.add('hidden');
-    }
-    function abrirModalOrdenacao() {
-      document.getElementById('modalOrdenacao').classList.remove('hidden');
-    }
-    function fecharModalOrdenacao() {
-      document.getElementById('modalOrdenacao').classList.add('hidden');
-    }
+    function abrirModalFiltros() { document.getElementById('modalFiltros').classList.remove('hidden'); }
+    function fecharModalFiltros() { document.getElementById('modalFiltros').classList.add('hidden'); }
+    function abrirModalOrdenacao() { document.getElementById('modalOrdenacao').classList.remove('hidden'); }
+    function fecharModalOrdenacao() { document.getElementById('modalOrdenacao').classList.add('hidden'); }
     
     function limparFiltros() {
-      // Desmarca todos os checkboxes dos filtros
       document.querySelectorAll('.filtro-checkbox').forEach(cb => cb.checked = false);
       aplicarFiltrosEOrdenacao();
       fecharModalFiltros();
     }
 
     function aplicarFiltrosEOrdenacao() {
-      // Pega todos os valores checados de cada grupo (cria arrays)
       filtrosStatus = Array.from(document.querySelectorAll('.status-checkbox:checked')).map(cb => cb.value);
       filtrosCategoria = Array.from(document.querySelectorAll('.categoria-checkbox:checked')).map(cb => cb.value);
       filtrosPrioridade = Array.from(document.querySelectorAll('.prioridade-checkbox:checked')).map(cb => cb.value);
       ordemAtual = document.getElementById('ordemSelecao').value;
 
-      // Badge visual quando algum filtro estiver ativo
       const badge = document.getElementById('badgeFiltros');
       if (filtrosStatus.length > 0 || filtrosCategoria.length > 0 || filtrosPrioridade.length > 0) {
         badge.classList.remove('hidden');
@@ -428,17 +415,13 @@
       const container = document.getElementById('listaDesejos');
       container.innerHTML = '';
 
-      // 1. FILTRAR A LISTA PRIMEIRO
       let listaVisual = appData.desejos.filter(d => {
-        // Se o array do filtro estiver vazio, significa que não há restrição ("Todas" selecionadas)
         const passaStatus = filtrosStatus.length === 0 || filtrosStatus.includes(d.status);
         const passaCategoria = filtrosCategoria.length === 0 || filtrosCategoria.includes(d.categoria);
         const passaPrioridade = filtrosPrioridade.length === 0 || filtrosPrioridade.includes(d.prioridade);
-
         return passaStatus && passaCategoria && passaPrioridade;
       });
 
-      // 2. CALCULAR O RESUMO FINANCEIRO SOMENTE DA LISTA FILTRADA
       let totalPendentes = 0;
       let totalGastoReal = 0;
       let economiaTotal = 0;
@@ -454,7 +437,6 @@
         }
       });
 
-      // Atualiza o painel superior com os valores calculados
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
       document.getElementById('totalRealizado').textContent = `R$ ${totalGastoReal.toFixed(2)}`;
       
@@ -462,7 +444,6 @@
       elEconomia.textContent = `R$ ${economiaTotal.toFixed(2)}`;
       elEconomia.className = economiaTotal >= 0 ? "text-xs font-bold text-emerald-500" : "text-xs font-bold text-red-500";
 
-      // 3. ORDENAR A LISTA
       const prioridadePeso = { 'Necessidade': 3, 'Desejo': 2, 'Sonho': 1 };
 
       if (ordemAtual === 'recentes') {
@@ -477,7 +458,6 @@
         listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
       }
 
-      // 4. RENDERIZAR NA TELA
       if (listaVisual.length === 0) {
         container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400 font-medium text-sm">Nenhum item encontrado com os filtros selecionados.</div>`;
         return;
@@ -489,44 +469,71 @@
       lucide.createIcons();
     }
 
+    // === NOVO DESIGN DO CARD ===
     function criarCardHtml(d) {
       const isComprado = d.status === "Comprado";
       
-      let corPrioridade = "bg-zinc-100 text-zinc-600";
-      if(d.prioridade === "Necessidade") corPrioridade = "bg-indigo-100 text-indigo-700 font-extrabold";
-      if(d.prioridade === "Desejo") corPrioridade = "bg-sky-100 text-sky-700 font-bold";
-      if(d.prioridade === "Sonho") corPrioridade = "bg-fuchsia-100 text-fuchsia-700 font-medium";
+      // Cores para a tag flutuante de prioridade
+      let corTextoPrioridade = "text-zinc-600";
+      if(d.prioridade === "Necessidade") corTextoPrioridade = "text-indigo-700 font-extrabold";
+      if(d.prioridade === "Desejo") corTextoPrioridade = "text-sky-700 font-bold";
+      if(d.prioridade === "Sonho") corTextoPrioridade = "text-fuchsia-700 font-bold";
 
       const badgeOpacity = isComprado ? "opacity-60 grayscale" : "";
 
-      return `
-        <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-zinc-200/80 relative flex flex-col ${badgeOpacity} hover:shadow-md transition-all duration-300">
-          ${d.linkImagem ? `<img src="${d.linkImagem}" class="w-full h-44 object-cover border-b border-zinc-100" onerror="this.style.display='none'">` : ''}
-          
-          <div class="p-5 flex-1 flex flex-col">
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-400">${d.categoria}</span>
-              <button onclick='abrirModalDesejo(${JSON.stringify(d).replace(/'/g, "&#39;")})' class="text-zinc-300 hover:text-indigo-600 transition-colors p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-            </div>
-            
-            <h3 class="font-bold text-zinc-900 text-lg leading-tight mb-3 tracking-tight ${isComprado ? 'line-through text-zinc-500' : ''}">${d.item}</h3>
-            
-            <div class="flex gap-2 mb-4">
-              <span class="text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider ${corPrioridade}">${d.prioridade}</span>
-            </div>
+      // Estrutura de observação (só exibe se houver conteúdo)
+      const htmlObservacao = d.observacoes 
+        ? `<p class="text-xs text-zinc-500 line-clamp-2 mb-3 leading-relaxed" title="${d.observacoes}">${d.observacoes}</p>`
+        : `<div class="mb-3"></div>`;
 
-            <div class="mt-auto pt-4 border-t border-zinc-100 flex items-end justify-between">
-              <div>
-                <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Valor Est.</span>
-                <span class="font-extrabold text-zinc-800 text-sm">R$ ${d.valorEstimado.toFixed(2)}</span>
+      // Se não tiver imagem, exibe um placeholder
+      const htmlImagem = d.linkImagem 
+        ? `<img src="${d.linkImagem}" class="w-full h-56 object-cover" onerror="this.style.display='none'">`
+        : `<div class="w-full h-56 bg-zinc-100 flex items-center justify-center text-zinc-300"><i data-lucide="image" class="w-8 h-8"></i></div>`;
+
+      // Botão de link da loja (circular)
+      const btnLink = d.linkLoja 
+        ? `<a href="${d.linkLoja}" target="_blank" class="w-9 h-9 flex items-center justify-center bg-zinc-50 text-zinc-500 border border-zinc-200/80 rounded-full hover:bg-zinc-100 hover:text-indigo-600 transition-colors" title="Ver na loja"><i data-lucide="shopping-bag" class="w-4 h-4"></i></a>` 
+        : '';
+
+      return `
+        <div class="bg-white rounded-[20px] overflow-hidden shadow-sm border border-zinc-200/80 relative flex flex-col ${badgeOpacity} hover:shadow-md transition-all duration-300">
+          
+          <!-- Área da Imagem Destaque com Badge Flutuante -->
+          <div class="relative">
+            ${htmlImagem}
+            <div class="absolute top-3 left-3">
+              <span class="text-[10px] px-3 py-1.5 rounded-xl uppercase tracking-wider shadow-sm backdrop-blur-md bg-white/95 ${corTextoPrioridade}">${d.prioridade}</span>
+            </div>
+          </div>
+          
+          <!-- Área de Informações Minimalista -->
+          <div class="p-5 flex-1 flex flex-col">
+            
+            <div class="flex justify-between items-start mb-1">
+              <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-400">${d.categoria}</span>
+              <button onclick='abrirModalDesejo(${JSON.stringify(d).replace(/'/g, "&#39;")})' class="text-zinc-400 hover:text-indigo-600 transition-colors -mt-1 -mr-1 p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+            </div>
+            
+            <h3 class="font-bold text-zinc-900 text-lg leading-tight mb-1.5 tracking-tight ${isComprado ? 'line-through text-zinc-500' : ''}">${d.item}</h3>
+            
+            ${htmlObservacao}
+
+            <!-- Rodapé do Card (Preço e Ações) -->
+            <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+              <div class="flex flex-col">
+                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Valor Est.</span>
+                <span class="font-black text-zinc-800 text-base">R$ ${d.valorEstimado.toFixed(2)}</span>
               </div>
+              
               <div class="flex gap-2">
-                ${d.linkLoja ? `<a href="${d.linkLoja}" target="_blank" class="p-2.5 bg-zinc-50 text-zinc-500 border border-zinc-200/80 rounded-xl hover:bg-zinc-100 hover:text-indigo-600 transition-colors"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
-                <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="p-2.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${isComprado ? 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
+                ${btnLink}
+                <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="w-9 h-9 flex items-center justify-center rounded-full font-bold transition-colors ${isComprado ? 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
                   <i data-lucide="${isComprado ? 'x' : 'check'}" class="w-4 h-4"></i>
                 </button>
               </div>
             </div>
+
           </div>
         </div>
       `;
