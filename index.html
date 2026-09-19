@@ -46,7 +46,7 @@
       </div>
       
       <div class="flex items-center gap-4">
-        <!-- Botões agora abrem Modais -->
+        <!-- Botões Modais -->
         <button onclick="abrirModalFiltros()" class="relative text-zinc-400 hover:text-indigo-600 transition-colors">
           <i data-lucide="filter" class="w-5 h-5"></i>
           <span id="badgeFiltros" class="hidden absolute -top-1 -right-1 w-2 h-2 bg-indigo-600 rounded-full border border-white"></span>
@@ -92,9 +92,10 @@
     <i data-lucide="plus" class="w-6 h-6"></i>
   </button>
 
-  <!-- MODAL DE FILTROS -->
+  <!-- MODAL DE FILTROS (Centralizado) -->
   <div id="modalFiltros" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
-    <div class="min-h-screen px-4 text-center flex items-end sm:items-center justify-center py-6">
+    <!-- Removido o items-end e colocado apenas items-center para garantir centralização em todas as telas -->
+    <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
       <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
         <div class="flex justify-between items-center mb-6">
           <div class="flex items-center gap-3">
@@ -115,19 +116,31 @@
               <option value="Comprado">Comprados</option>
             </select>
           </div>
-          <div>
-            <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
-            <select id="filtroCategoria" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
-              <option value="Todas">Todas</option>
-              <option value="Bebê">Bebê</option>
-              <option value="Casa">Casa</option>
-              <option value="Eletrônicos">Eletrônicos</option>
-              <option value="Viagem">Viagem</option>
-              <option value="Carro">Carro</option>
-              <option value="Roupas">Roupas</option>
-              <option value="Lazer">Lazer</option>
-              <option value="Outros">Outros</option>
-            </select>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
+              <select id="filtroCategoria" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
+                <option value="Todas">Todas</option>
+                <option value="Bebê">Bebê</option>
+                <option value="Casa">Casa</option>
+                <option value="Eletrônicos">Eletrônicos</option>
+                <option value="Viagem">Viagem</option>
+                <option value="Carro">Carro</option>
+                <option value="Roupas">Roupas</option>
+                <option value="Lazer">Lazer</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Prioridade</label>
+              <select id="filtroPrioridade" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3.5 border border-zinc-200/80 outline-none focus:ring-2 focus:ring-indigo-600 transition">
+                <option value="Todas">Todas</option>
+                <option value="Necessidade">Necessidade</option>
+                <option value="Desejo">Desejo</option>
+                <option value="Sonho">Sonho</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -139,9 +152,10 @@
     </div>
   </div>
 
-  <!-- MODAL DE ORDENAÇÃO -->
+  <!-- MODAL DE ORDENAÇÃO (Centralizado) -->
   <div id="modalOrdenacao" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
-    <div class="min-h-screen px-4 text-center flex items-end sm:items-center justify-center py-6">
+    <!-- Ajustado para items-center para garantir centralização -->
+    <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
       <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
         <div class="flex justify-between items-center mb-6">
           <div class="flex items-center gap-3">
@@ -299,6 +313,7 @@
 
     let filtroStatus = 'Todos';
     let filtroCategoria = 'Todas';
+    let filtroPrioridade = 'Todas'; // Nova variável de prioridade
     let ordemAtual = 'recentes';
 
     window.onload = () => {
@@ -381,6 +396,7 @@
     function limparFiltros() {
       document.getElementById('filtroStatus').value = 'Todos';
       document.getElementById('filtroCategoria').value = 'Todas';
+      document.getElementById('filtroPrioridade').value = 'Todas'; // Limpa a prioridade
       aplicarFiltrosEOrdenacao();
       fecharModalFiltros();
     }
@@ -388,11 +404,12 @@
     function aplicarFiltrosEOrdenacao() {
       filtroStatus = document.getElementById('filtroStatus').value;
       filtroCategoria = document.getElementById('filtroCategoria').value;
+      filtroPrioridade = document.getElementById('filtroPrioridade').value;
       ordemAtual = document.getElementById('ordemSelecao').value;
 
       // Badge visual quando algum filtro estiver ativo
       const badge = document.getElementById('badgeFiltros');
-      if (filtroStatus !== 'Todos' || filtroCategoria !== 'Todas') {
+      if (filtroStatus !== 'Todos' || filtroCategoria !== 'Todas' || filtroPrioridade !== 'Todas') {
         badge.classList.remove('hidden');
       } else {
         badge.classList.add('hidden');
@@ -421,8 +438,9 @@
         
         const passaStatus = (filtroStatus === 'Todos' || d.status === filtroStatus);
         const passaCategoria = (filtroCategoria === 'Todas' || d.categoria === filtroCategoria);
+        const passaPrioridade = (filtroPrioridade === 'Todas' || d.prioridade === filtroPrioridade);
 
-        return passaStatus && passaCategoria;
+        return passaStatus && passaCategoria && passaPrioridade;
       });
 
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
