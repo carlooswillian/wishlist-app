@@ -5,82 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nossa Lista de Desejos</title>
   <link rel="manifest" href="manifest.json">
-  <!-- Cor atualizada para o Índigo Moderno -->
+  <!-- Atualizado para a nova cor principal (Indigo-600) -->
   <meta name="theme-color" content="#4f46e5">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Efeito de vidro mais suave e moderno (estilo iOS) */
-    .glass { 
-      background: rgba(248, 250, 252, 0.80); 
-      backdrop-filter: saturate(180%) blur(16px); 
-      -webkit-backdrop-filter: saturate(180%) blur(16px);
-    }
+    /* Suaviza a barra de rolagem e toques */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     body { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-24 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-zinc-50 text-zinc-800 min-h-screen pb-24 font-sans selection:bg-indigo-100 selection:text-indigo-900">
 
   <!-- URL DO GOOGLE APPS SCRIPT -->
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfYhfTtN8pVtSy9IJU4A3yIkVoa2bBeIHWuMyCNs86RhNxyf6OEP1D5-rChUdC7w/exec";
   </script>
 
-  <!-- TELA DE BLOQUEIO (MODERNA) -->
-  <div id="telaBloqueio" class="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2rem] p-8 w-full max-w-xs shadow-2xl space-y-6 text-center transform transition-all">
-      <div class="bg-indigo-50 text-indigo-600 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-inner">
-        <i data-lucide="lock" class="w-8 h-8"></i>
+  <!-- TELA DE BLOQUEIO MINIMALISTA -->
+  <div id="telaBloqueio" class="fixed inset-0 bg-zinc-950 z-[70] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[24px] p-8 w-full max-w-xs shadow-2xl space-y-6 text-center">
+      <div class="bg-indigo-50 text-indigo-600 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-2">
+        <i data-lucide="lock" class="w-7 h-7"></i>
       </div>
       <div>
-        <h3 class="font-extrabold text-slate-900 text-2xl tracking-tight">Privado</h3>
-        <p class="text-sm text-slate-500 mt-1">Acesse sua lista de desejos.</p>
+        <h3 class="font-bold text-zinc-900 text-xl tracking-tight">Nossos Sonhos</h3>
+        <p class="text-sm text-zinc-500 mt-1">Insira o PIN para acessar</p>
       </div>
-      <input type="password" id="inputPinRaiz" maxlength="4" class="w-full text-center text-3xl font-black tracking-[0.5em] bg-slate-50 border-none rounded-2xl py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-indigo-50/50 transition-all placeholder:text-slate-300" placeholder="••••">
-      <button onclick="desbloquearRaiz()" class="w-full py-4 bg-indigo-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all">Desbloquear</button>
+      <input type="password" id="inputPinRaiz" maxlength="4" class="w-full text-center text-3xl font-black tracking-[0.5em] bg-zinc-50 border border-zinc-200 rounded-2xl py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-zinc-800" placeholder="••••">
+      <button onclick="desbloquearRaiz()" class="w-full py-4 bg-indigo-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 active:scale-95 transition-all">Acessar Lista</button>
     </div>
   </div>
 
-  <!-- CABEÇALHO UNIFICADO E FIXO (MINIMALISTA) -->
-  <div class="sticky top-0 z-40 glass border-b border-slate-200/50 pb-3 pt-2">
-    <header class="px-5 py-3 flex items-center justify-between">
+  <!-- CABEÇALHO FIXO + CONTROLES (STICKY MINIMALISTA) -->
+  <div class="sticky top-0 z-40 bg-zinc-50/85 backdrop-blur-xl border-b border-zinc-200/80 shadow-sm">
+    
+    <!-- Linha 1: Logo e Ações -->
+    <div class="px-5 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <h1 class="font-extrabold text-2xl tracking-tighter text-slate-900">wish<span class="text-indigo-600">list</span></h1>
+        <i data-lucide="gift" class="w-5 h-5 text-indigo-600"></i>
+        <h1 class="font-bold text-xl tracking-tight text-zinc-900">Wishlist</h1>
       </div>
-      <button onclick="sairDoPainel()" class="p-2 -mr-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full active:scale-95 transition-all">
-        <i data-lucide="log-out" class="w-5 h-5"></i>
-      </button>
-    </header>
-
-    <!-- CONTROLES DE FILTRO (FIXOS COM O CABEÇALHO) -->
-    <div class="px-4 flex gap-2 mt-1">
-      <button onclick="alternarPainel('painelFiltros')" class="flex-1 bg-white border border-slate-200/70 text-slate-600 font-bold text-[11px] uppercase tracking-wide py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 transition active:scale-95">
-        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-indigo-600"></i> Filtros
-        <span id="badgeFiltros" class="hidden w-1.5 h-1.5 bg-indigo-600 rounded-full ml-1"></span>
-      </button>
-
-      <button onclick="alternarPainel('painelOrdenacao')" class="flex-1 bg-white border border-slate-200/70 text-slate-600 font-bold text-[11px] uppercase tracking-wide py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 transition active:scale-95">
-        <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 text-indigo-600"></i> Ordenar
-      </button>
+      
+      <div class="flex items-center gap-4">
+        <!-- Ícones de Filtro e Ordenação direto no header -->
+        <button onclick="alternarPainel('painelFiltros')" class="relative text-zinc-400 hover:text-indigo-600 transition-colors">
+          <i data-lucide="filter" class="w-5 h-5"></i>
+          <span id="badgeFiltros" class="hidden absolute -top-1 -right-1 w-2 h-2 bg-indigo-600 rounded-full border border-white"></span>
+        </button>
+        <button onclick="alternarPainel('painelOrdenacao')" class="text-zinc-400 hover:text-indigo-600 transition-colors">
+          <i data-lucide="arrow-up-down" class="w-5 h-5"></i>
+        </button>
+        <div class="w-px h-5 bg-zinc-200 mx-1"></div>
+        <button onclick="sairDoPainel()" class="text-zinc-400 hover:text-red-500 transition-colors">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- PAINÉIS EXPANSÍVEIS (FLUTUANTES) -->
-    <div class="px-4 relative">
-      <div id="painelFiltros" class="hidden absolute left-4 right-4 top-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 grid grid-cols-2 gap-4 transition-all">
+    <!-- Linha 2: Resumo Financeiro Condensado -->
+    <div class="px-5 pb-4">
+      <div class="bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm flex justify-between items-center text-center">
+        <div class="flex-1">
+          <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">A Comprar</span>
+          <span id="totalPendente" class="text-xs font-bold text-zinc-800">R$ 0</span>
+        </div>
+        <div class="w-px h-8 bg-zinc-100"></div>
+        <div class="flex-1">
+          <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Gasto</span>
+          <span id="totalRealizado" class="text-xs font-bold text-indigo-600">R$ 0</span>
+        </div>
+        <div class="w-px h-8 bg-zinc-100"></div>
+        <div class="flex-1">
+          <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Economia</span>
+          <span id="totalEconomia" class="text-xs font-bold text-emerald-500">R$ 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINÉIS EXPANSÍVEIS DE FILTRO E ORDENAÇÃO (Ficam sob o vidro sticky) -->
+    <div id="painelFiltros" class="hidden px-5 pb-4 transition-all">
+      <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm grid grid-cols-2 gap-3">
         <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block">Status</label>
-          <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-2.5 border-none outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+          <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Status</label>
+          <select id="filtroStatus" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-xs font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
             <option value="Todos">Todos</option>
             <option value="Pendente">Pendentes</option>
             <option value="Comprado">Comprados</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block">Categoria</label>
-          <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-2.5 border-none outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+          <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Categoria</label>
+          <select id="filtroCategoria" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-xs font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
             <option value="Todas">Todas</option>
             <option value="Bebê">Bebê</option>
             <option value="Casa">Casa</option>
@@ -93,43 +111,24 @@
           </select>
         </div>
       </div>
+    </div>
 
-      <div id="painelOrdenacao" class="hidden absolute left-4 right-4 top-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 transition-all">
-        <label class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block">Ordenar Por</label>
-        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-slate-50 text-slate-700 text-xs font-bold rounded-xl p-3 border-none outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-          <option value="recentes">Mais Recentes</option>
+    <div id="painelOrdenacao" class="hidden px-5 pb-4 transition-all">
+      <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+        <label class="text-[10px] font-bold text-zinc-400 uppercase mb-1.5 block">Ordenar Por</label>
+        <select id="ordemSelecao" onchange="aplicarFiltrosEOrdenacao()" class="w-full bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-xl p-3 border border-zinc-100 outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer transition">
+          <option value="recentes">Adicionados Recentemente</option>
           <option value="antigos">Mais Antigos</option>
           <option value="menorValor">Menor Valor</option>
           <option value="maiorValor">Maior Valor</option>
-          <option value="prioridade">Prioridade</option>
-          <option value="nome">Nome (A-Z)</option>
+          <option value="prioridade">Maior Prioridade</option>
+          <option value="nome">Ordem Alfabética (A-Z)</option>
         </select>
       </div>
     </div>
   </div>
 
-  <main class="max-w-xl mx-auto p-4 space-y-6">
-    
-    <!-- DASHBOARD FINANCEIRO MINIMALISTA -->
-    <div class="px-2 pt-2 pb-4">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">A Comprar</span>
-          <span id="totalPendente" class="text-xl font-black text-slate-800">R$ 0</span>
-        </div>
-        <div class="w-px h-8 bg-slate-200"></div>
-        <div class="flex flex-col text-center">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Gasto</span>
-          <span id="totalRealizado" class="text-xl font-black text-slate-800">R$ 0</span>
-        </div>
-        <div class="w-px h-8 bg-slate-200"></div>
-        <div class="flex flex-col text-right">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Economia</span>
-          <span id="totalEconomia" class="text-xl font-black text-indigo-600">R$ 0</span>
-        </div>
-      </div>
-    </div>
-
+  <main class="max-w-xl mx-auto p-5 pt-6">
     <!-- LISTA DE DESEJOS -->
     <div id="listaDesejos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- Injetado via JS -->
@@ -137,18 +136,18 @@
   </main>
 
   <!-- BOTÃO FLUTUANTE (FAB) -->
-  <button onclick="abrirModalDesejo()" class="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-lg shadow-indigo-300 hover:bg-indigo-700 active:scale-90 transition-all z-30">
+  <button onclick="abrirModalDesejo()" class="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 active:scale-90 transition-all z-30 flex items-center justify-center">
     <i data-lucide="plus" class="w-6 h-6"></i>
   </button>
 
   <!-- MODAL ADICIONAR/EDITAR DESEJO -->
-  <div id="modalDesejo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 overflow-y-auto">
+  <div id="modalDesejo" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto hide-scrollbar">
     <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
-      <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl text-left inline-block align-middle relative transform transition-all">
+      <div class="bg-white rounded-[24px] p-6 w-full max-w-md shadow-2xl text-left relative transform transition-all">
         
         <div class="flex justify-between items-center mb-6">
-          <h3 id="tituloModal" class="font-extrabold text-slate-900 text-2xl tracking-tight">Novo Item</h3>
-          <button id="btnExcluirModal" onclick="excluirDesejoDoModal()" class="hidden text-red-500 hover:bg-red-50 p-2 rounded-full transition" title="Excluir">
+          <h3 id="tituloModal" class="font-bold text-zinc-900 text-xl tracking-tight">Novo Desejo</h3>
+          <button id="btnExcluirModal" onclick="excluirDesejoDoModal()" class="hidden text-red-500 hover:bg-red-50 p-2 rounded-xl transition-colors" title="Excluir">
             <i data-lucide="trash-2" class="w-5 h-5"></i>
           </button>
         </div>
@@ -157,18 +156,18 @@
 
         <div class="space-y-4">
           <div>
-            <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">O que queremos?</label>
-            <input type="text" id="dsItem" placeholder="Ex: Berço, Fraldas..." class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all" oninput="atualizarPreviewImg()">
+            <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">O que queremos?</label>
+            <input type="text" id="dsItem" placeholder="Ex: Berço, Fraldas..." class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all" oninput="atualizarPreviewImg()">
           </div>
           
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">Valor (R$)</label>
-              <input type="number" step="0.01" id="dsValor" placeholder="0.00" class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all">
+              <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">Valor (R$)</label>
+              <input type="number" step="0.01" id="dsValor" placeholder="0.00" class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all">
             </div>
             <div>
-              <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">Prioridade</label>
-              <select id="dsPrioridade" class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all cursor-pointer">
+              <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">Prioridade</label>
+              <select id="dsPrioridade" class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all">
                 <option value="Necessidade">Necessidade</option>
                 <option value="Desejo" selected>Desejo</option>
                 <option value="Sonho">Sonho</option>
@@ -177,8 +176,8 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">Categoria</label>
-            <select id="dsCategoria" class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all cursor-pointer">
+            <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">Categoria</label>
+            <select id="dsCategoria" class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all">
               <option value="Bebê">Bebê</option>
               <option value="Casa">Casa</option>
               <option value="Eletrônicos">Eletrônicos</option>
@@ -191,50 +190,50 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">Link da Loja</label>
+            <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">Link da Loja</label>
             <div class="relative">
-              <i data-lucide="link" class="w-4 h-4 absolute left-3.5 top-4 text-slate-400"></i>
-              <input type="url" id="dsLinkLoja" placeholder="https://..." class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 pl-10 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all">
+              <i data-lucide="link" class="w-4 h-4 absolute left-3.5 top-3.5 text-zinc-400"></i>
+              <input type="url" id="dsLinkLoja" placeholder="https://..." class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 pl-10 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all">
             </div>
           </div>
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider block">Link da Imagem</label>
+              <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider block">Link da Imagem</label>
               <a id="btnBuscaImg" href="#" target="_blank" class="text-[10px] font-bold text-indigo-600 hover:underline">Buscar no Google</a>
             </div>
-            <input type="url" id="dsLinkImagem" placeholder="https://..." class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all" oninput="atualizarPreviewImg()">
-            <div id="boxImgPreview" class="hidden mt-3 relative w-full h-32 rounded-2xl overflow-hidden border border-slate-100 bg-slate-100">
+            <input type="url" id="dsLinkImagem" placeholder="https://..." class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all" oninput="atualizarPreviewImg()">
+            <div id="boxImgPreview" class="hidden mt-3 relative w-full h-36 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-100 shadow-inner">
               <img id="imgPreview" class="w-full h-full object-cover">
             </div>
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-1.5 block">Observações</label>
-            <textarea id="dsObservacoes" rows="2" placeholder="Motivos, tamanho, cor..." class="w-full bg-slate-50 border border-transparent rounded-2xl p-3.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-0 outline-none transition-all"></textarea>
+            <label class="font-bold text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5 block">Observações</label>
+            <textarea id="dsObservacoes" rows="2" placeholder="Por que queremos? Detalhes..." class="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-indigo-600 focus:bg-white outline-none transition-all"></textarea>
           </div>
         </div>
 
-        <div class="flex gap-3 justify-end pt-6 mt-6 border-t border-slate-100">
-          <button onclick="fecharModalDesejo()" class="px-5 py-3 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-2xl transition">Cancelar</button>
-          <button onclick="salvarDesejo()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-95">Salvar Item</button>
+        <div class="flex gap-3 justify-end pt-6 mt-6 border-t border-zinc-100">
+          <button onclick="fecharModalDesejo()" class="px-5 py-3 text-zinc-500 font-bold text-sm hover:bg-zinc-100 rounded-xl transition-colors">Cancelar</button>
+          <button onclick="salvarDesejo()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition-all active:scale-95">Salvar Item</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- MODAL VALOR PAGO (COMPRA) -->
-  <div id="modalValorPago" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 overflow-y-auto">
+  <div id="modalValorPago" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm hidden z-50 overflow-y-auto">
     <div class="min-h-screen px-4 text-center flex items-center justify-center py-6">
-      <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-left inline-block align-middle relative transform transition-all">
+      <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl text-left relative transform transition-all">
         
         <div class="flex items-center gap-4 mb-6">
-          <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-2xl shadow-inner">
-            <i data-lucide="check-circle" class="w-7 h-7"></i>
+          <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-2xl">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-slate-900 text-xl tracking-tight">Comprado!</h3>
-            <p class="text-sm text-slate-500">Registre o valor real pago.</p>
+            <h3 class="font-bold text-zinc-900 text-xl tracking-tight">Comprado!</h3>
+            <p class="text-sm text-zinc-500">Registre o valor real pago.</p>
           </div>
         </div>
         
@@ -242,24 +241,23 @@
         <input type="hidden" id="vpStatus">
         
         <div class="mb-6">
-          <label class="font-bold text-slate-400 text-[10px] uppercase tracking-wider mb-2 block text-center">Valor Pago (R$)</label>
-          <input type="number" step="0.01" id="vpValor" class="w-full text-4xl font-black bg-slate-50 border-none rounded-2xl py-5 text-emerald-600 focus:ring-2 focus:ring-emerald-500 outline-none transition text-center placeholder:text-emerald-200" placeholder="0.00">
-          <p id="vpEstimativa" class="text-xs text-slate-400 text-center mt-3 font-medium"></p>
+          <input type="number" step="0.01" id="vpValor" class="w-full text-4xl font-black bg-zinc-50 border border-zinc-200/80 rounded-2xl py-6 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-center tracking-tight" placeholder="0.00">
+          <p id="vpEstimativa" class="text-[11px] text-zinc-400 text-center mt-3 font-medium uppercase tracking-wider"></p>
         </div>
 
         <div class="flex gap-3 justify-end">
-          <button onclick="fecharModalValorPago()" class="flex-1 py-3.5 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-2xl transition">Cancelar</button>
-          <button onclick="confirmarStatusComprado()" class="flex-1 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-95">Confirmar</button>
+          <button onclick="fecharModalValorPago()" class="flex-1 py-3.5 text-zinc-600 font-bold text-sm hover:bg-zinc-50 rounded-xl border border-zinc-200 transition-colors">Cancelar</button>
+          <button onclick="confirmarStatusComprado()" class="flex-1 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95">Confirmar</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- MODAL LOADING -->
-  <div id="modalLoading" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center">
-    <div class="bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4">
-      <div class="animate-spin rounded-full h-8 w-8 border-[3px] border-indigo-600 border-t-transparent"></div>
-      <p id="txtLoading" class="font-bold text-slate-700 text-sm tracking-wide">Sincronizando...</p>
+  <div id="modalLoading" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-sm hidden z-[80] flex items-center justify-center">
+    <div class="bg-white rounded-[24px] p-6 shadow-2xl flex flex-col items-center gap-4 min-w-[160px]">
+      <div class="animate-spin rounded-full h-8 w-8 border-4 border-indigo-100 border-t-indigo-600"></div>
+      <p id="txtLoading" class="font-bold text-zinc-800 text-sm tracking-tight">Sincronizando...</p>
     </div>
   </div>
 
@@ -321,7 +319,7 @@
     }
 
     async function carregarDados() {
-      mostrarLoading("Atualizando...");
+      mostrarLoading("Puxando desejos...");
       try {
         const res = await API({ action: 'getDados' });
         if (res.sucesso) {
@@ -353,12 +351,14 @@
       filtroCategoria = document.getElementById('filtroCategoria').value;
       ordemAtual = document.getElementById('ordemSelecao').value;
 
+      // Badge visual quando algum filtro estiver ativo
       const badge = document.getElementById('badgeFiltros');
       if (filtroStatus !== 'Todos' || filtroCategoria !== 'Todas') {
         badge.classList.remove('hidden');
       } else {
         badge.classList.add('hidden');
       }
+
       renderizarLista();
     }
 
@@ -370,77 +370,93 @@
       let totalGastoReal = 0;
       let economiaTotal = 0;
 
+      // 1. Filtragem e cálculo financeiro global
       let listaVisual = appData.desejos.filter(d => {
-        if(d.status === "Pendente") totalPendentes += d.valorEstimado;
+        if(d.status === "Pendente") {
+            totalPendentes += d.valorEstimado;
+        }
         if(d.status === "Comprado") {
             const pago = d.valorPago !== undefined ? d.valorPago : 0;
             totalGastoReal += pago;
             economiaTotal += (d.valorEstimado - pago);
         }
+        
         const passaStatus = (filtroStatus === 'Todos' || d.status === filtroStatus);
         const passaCategoria = (filtroCategoria === 'Todas' || d.categoria === filtroCategoria);
+
         return passaStatus && passaCategoria;
       });
 
+      // Atualiza os cards financeiros
       document.getElementById('totalPendente').textContent = `R$ ${totalPendentes.toFixed(2)}`;
       document.getElementById('totalRealizado').textContent = `R$ ${totalGastoReal.toFixed(2)}`;
       
       const elEconomia = document.getElementById('totalEconomia');
       elEconomia.textContent = `R$ ${economiaTotal.toFixed(2)}`;
-      elEconomia.className = economiaTotal >= 0 ? "text-xl font-black text-indigo-600" : "text-xl font-black text-red-500";
+      // Verde se positivo/zero, vermelho se negativo
+      elEconomia.className = economiaTotal >= 0 ? "text-xs font-bold text-emerald-500" : "text-xs font-bold text-red-500";
 
+      // 2. Ordenação da lista
       const prioridadePeso = { 'Necessidade': 3, 'Desejo': 2, 'Sonho': 1 };
 
-      if (ordemAtual === 'recentes') listaVisual.reverse();
-      else if (ordemAtual === 'menorValor') listaVisual.sort((a, b) => (a.valorEstimado || 0) - (b.valorEstimado || 0));
-      else if (ordemAtual === 'maiorValor') listaVisual.sort((a, b) => (b.valorEstimado || 0) - (a.valorEstimado || 0));
-      else if (ordemAtual === 'prioridade') listaVisual.sort((a, b) => (prioridadePeso[b.prioridade] || 0) - (prioridadePeso[a.prioridade] || 0));
-      else if (ordemAtual === 'nome') listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
+      if (ordemAtual === 'recentes') {
+        listaVisual.reverse();
+      } else if (ordemAtual === 'menorValor') {
+        listaVisual.sort((a, b) => (a.valorEstimado || 0) - (b.valorEstimado || 0));
+      } else if (ordemAtual === 'maiorValor') {
+        listaVisual.sort((a, b) => (b.valorEstimado || 0) - (a.valorEstimado || 0));
+      } else if (ordemAtual === 'prioridade') {
+        listaVisual.sort((a, b) => (prioridadePeso[b.prioridade] || 0) - (prioridadePeso[a.prioridade] || 0));
+      } else if (ordemAtual === 'nome') {
+        listaVisual.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
+      }
 
       if (listaVisual.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum item encontrado.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400 font-medium text-sm">Nenhum item encontrado com os filtros selecionados.</div>`;
         return;
       }
 
-      listaVisual.forEach(d => { container.innerHTML += criarCardHtml(d); });
+      listaVisual.forEach(d => {
+        container.innerHTML += criarCardHtml(d);
+      });
       lucide.createIcons();
     }
 
     function criarCardHtml(d) {
       const isComprado = d.status === "Comprado";
       
-      // Cores das tags. 'Necessidade' mantida como red/rose para indicar alerta/importância
-      let corPrioridade = "bg-slate-100 text-slate-600";
-      if(d.prioridade === "Necessidade") corPrioridade = "bg-red-50 text-red-600 font-extrabold";
-      if(d.prioridade === "Desejo") corPrioridade = "bg-indigo-50 text-indigo-600 font-bold";
-      if(d.prioridade === "Sonho") corPrioridade = "bg-purple-50 text-purple-600 font-medium";
+      // Cores mais premium para as tags
+      let corPrioridade = "bg-zinc-100 text-zinc-600";
+      if(d.prioridade === "Necessidade") corPrioridade = "bg-indigo-100 text-indigo-700 font-extrabold";
+      if(d.prioridade === "Desejo") corPrioridade = "bg-sky-100 text-sky-700 font-bold";
+      if(d.prioridade === "Sonho") corPrioridade = "bg-fuchsia-100 text-fuchsia-700 font-medium";
 
       const badgeOpacity = isComprado ? "opacity-60 grayscale" : "";
 
       return `
-        <div class="bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] border border-slate-100/80 relative flex flex-col ${badgeOpacity} transition-all">
-          ${d.linkImagem ? `<img src="${d.linkImagem}" class="w-full h-44 object-cover" onerror="this.style.display='none'">` : ''}
+        <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-zinc-200/80 relative flex flex-col ${badgeOpacity} hover:shadow-md transition-all duration-300">
+          ${d.linkImagem ? `<img src="${d.linkImagem}" class="w-full h-44 object-cover border-b border-zinc-100" onerror="this.style.display='none'">` : ''}
           
           <div class="p-5 flex-1 flex flex-col">
             <div class="flex justify-between items-start mb-2">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${d.categoria}</span>
-              <button onclick='abrirModalDesejo(${JSON.stringify(d).replace(/'/g, "&#39;")})' class="text-slate-300 hover:text-indigo-600 transition -mt-1 -mr-1 p-2"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+              <span class="text-[10px] uppercase tracking-wider font-bold text-zinc-400">${d.categoria}</span>
+              <button onclick='abrirModalDesejo(${JSON.stringify(d).replace(/'/g, "&#39;")})' class="text-zinc-300 hover:text-indigo-600 transition-colors p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
             </div>
             
-            <h3 class="font-extrabold text-slate-900 text-lg leading-tight mb-2 tracking-tight ${isComprado ? 'line-through text-slate-400' : ''}">${d.item}</h3>
+            <h3 class="font-bold text-zinc-900 text-lg leading-tight mb-3 tracking-tight ${isComprado ? 'line-through text-zinc-500' : ''}">${d.item}</h3>
             
             <div class="flex gap-2 mb-4">
               <span class="text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider ${corPrioridade}">${d.prioridade}</span>
             </div>
 
-            <div class="mt-auto pt-4 border-t border-slate-100/80 flex items-end justify-between">
+            <div class="mt-auto pt-4 border-t border-zinc-100 flex items-end justify-between">
               <div>
-                <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Valor Est.</span>
-                <span class="font-black text-slate-800 text-base">R$ ${d.valorEstimado.toFixed(2)}</span>
+                <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Valor Est.</span>
+                <span class="font-extrabold text-zinc-800 text-sm">R$ ${d.valorEstimado.toFixed(2)}</span>
               </div>
               <div class="flex gap-2">
-                ${d.linkLoja ? `<a href="${d.linkLoja}" target="_blank" class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 hover:text-indigo-600 transition"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
-                <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="p-2.5 rounded-xl font-bold transition flex items-center justify-center ${isComprado ? 'bg-slate-100 text-slate-400 hover:bg-slate-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
+                ${d.linkLoja ? `<a href="${d.linkLoja}" target="_blank" class="p-2.5 bg-zinc-50 text-zinc-500 border border-zinc-200/80 rounded-xl hover:bg-zinc-100 hover:text-indigo-600 transition-colors"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                <button onclick="iniciarAlteracaoStatus('${d.id}', '${isComprado ? 'Pendente' : 'Comprado'}', ${d.valorEstimado})" class="p-2.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${isComprado ? 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'}" title="${isComprado ? 'Desmarcar' : 'Marcar como Comprado'}">
                   <i data-lucide="${isComprado ? 'x' : 'check'}" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -479,7 +495,7 @@
         document.getElementById('dsLinkImagem').value = d.linkImagem;
         document.getElementById('dsObservacoes').value = d.observacoes;
       } else {
-        document.getElementById('tituloModal').textContent = 'Novo Item';
+        document.getElementById('tituloModal').textContent = 'Novo Desejo';
         document.getElementById('btnExcluirModal').classList.add('hidden');
         document.getElementById('dsId').value = '';
         document.getElementById('dsItem').value = '';
